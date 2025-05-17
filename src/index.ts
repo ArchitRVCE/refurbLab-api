@@ -1,18 +1,28 @@
-import fastify from 'fastify';
-const app = fastify({ logger: true });
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { connectDB } from './config/db';
+import routes from './routes';
 
-app.get('/', async () => {
-  return { message: 'Hello, fastify with typescript!' };
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 4000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-const start = async () => {
-  try {
-    await app.listen({ port: 3000 });
-    app.log.info('Server listening on http://localhost:3000');
-  } catch (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
-};
+//Routes
+app.use('/api', routes);
 
-start();
+// Database connection
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+});
