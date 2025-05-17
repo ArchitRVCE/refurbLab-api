@@ -27,6 +27,18 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    
+  frontend:
+    build:
+      context: ../refurblab-dashboard
+      dockerfile: Dockerfile
+    container_name: refurblab_dashboard
+    env_file:
+      - .env     # if you have frontend-specific env vars
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
 
 volumes:
   pgdata:
